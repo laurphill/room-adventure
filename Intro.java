@@ -14,7 +14,6 @@ public class Intro {
         intro.append("\nLook: 'look (object)'\n");
         intro.append("\nTake: 'take (object)'\n");
         intro.append("\nUse: 'use (object)'\n");
-        intro.append("\nMap: 'map'\n");
         intro.append("------------------------------------------------------------------------------------\n");
 
         System.out.println(intro.toString());
