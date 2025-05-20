@@ -1,14 +1,15 @@
 import java.util.Scanner; // Import Scanner for reading user input
 public class RoomAdventure { // Main class containing game logic
 
+    // constants
+    final private static String DEFAULT_STATUS =
+        "\nSorry, I do not understand. Try [verb] [noun]. Valid verbs include 'go', 'look', 'use', and 'take'."; // Default error message
+    
     // class variables
     private static Room currentRoom; // The room the player is currently in
     private static String[] inventory = {null, null, null, null, null}; // Player inventory slots
     private static String status; // Message to display after each action
-
-    // constants
-    final private static String DEFAULT_STATUS =
-        "\nSorry, I do not understand. Try [verb] [noun]. Valid verbs include 'go', 'look', and 'take'."; // Default error message
+    private static boolean hasItem; // If an item is in inventory
 
     private static void handleGo(String noun) { // Handles moving between rooms
         String[] exitDirections = currentRoom.getExitDirections(); // Get available directions
@@ -20,7 +21,7 @@ public class RoomAdventure { // Main class containing game logic
                 currentRoom = exitDestinations[i]; // Change current room
                 status = "\nChanged Room"; // Update status
                 try{
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 }catch(InterruptedException e){
                 }
             }
@@ -54,12 +55,47 @@ public class RoomAdventure { // Main class containing game logic
         }
     }
 
+    private static void handleUse(String noun) { // Handles picking up items
+        status = "\nYou can't use that."; // Default if not useable
+        String[] grabbables = currentRoom.getGrabbables(); // Items that can be taken
+        // Check if the item is in the current room's items and get its use
+            String[] items = currentRoom.getItems();
+            String[] uses = currentRoom.getItemUses();
+            for (int i = 0; i < items.length; i++) {
+                if (noun.equals(items[i])) {
+                    if (uses != null && uses[i] != null) {
+                        status = "\n" + uses[i];
+                    } else {
+                        status = "\nNothing happens.";
+                    }
+                    return;
+                }
+            }
+            status = "\nYou can't use that here.";
+        for (String item : inventory) { // Loop through inventory
+            if (noun.equals(item)) { // If user-noun matches inventory item
+                hasItem = true;
+                break; // Exit inventory loop
+                    }
+            else {
+                hasItem = false;
+            }
+            if (!hasItem) {
+                for (String grabbable:grabbables) {
+                    if (noun.equals(grabbable)) {
+                    status = "\nYou don't have that item.";
+                    }
+                }
+            }
+        }
+    }
+
     private static void setupGame() { // Initializes game world
         Room room1 = new Room("Bedroom"); // Create Room 1
         Room room2 = new Room("Bathroom"); // Create Room 2
-        Room room3 = new Room("Living Room");
-        Room room4 = new Room("Kitchen");
-        Room room5 = new Room("Garage");
+        Room room3 = new Room("Living Room"); // Create Room 3
+        Room room4 = new Room("Kitchen"); // Create Room 4
+        Room room5 = new Room("Garage"); // Create Room 5
 
         // ROOM 1 (BEDROOM)
         String[] room1ExitDirections = {"west", "south"}; // Room 1 exits
@@ -69,11 +105,16 @@ public class RoomAdventure { // Main class containing game logic
             "\nIt is a chair",
             "\nIt's a desk, there is a key on it."
         };
+        String[] room1ItemUses = {
+            "You sit on the chair. It's surprisingly comfortable.",
+            "You open the desk and find a key."
+        };
         String[] room1Grabbables = {"key"}; // Items you can take in Room 1
         room1.setExitDirections(room1ExitDirections); // Set exits
         room1.setExitDestinations(room1ExitDestinations); // Set exit destinations
         room1.setItems(room1Items); // Set visible items
         room1.setItemDescriptions(room1ItemDescriptions); // Set item descriptions
+        room1.setItemUses(room1ItemUses); // Set item uses
         room1.setGrabbables(room1Grabbables); // Set grabbable items
 
         // ROOM 2 (BATHROOM)
@@ -181,19 +222,23 @@ public class RoomAdventure { // Main class containing game logic
                 case "take": // If verb is 'take'
                     handleTake(noun); // Pick up an item
                     break;
+                case "use": // If Verb is 'use'
+                    handleUse(noun);
+                    break;
                 default: // If verb is unrecognized
                     status = DEFAULT_STATUS; // Set status to error message
             }
 
             System.out.println(status); // Print the status message
             try{
-                Thread.sleep(2000);
+                Thread.sleep(100);
                 }catch(InterruptedException e){
             }
             
         }
     }
 }
+    
 
 class Room { // Represents a game room
     private String name; // Room name
@@ -202,6 +247,7 @@ class Room { // Represents a game room
     private String[] items; // Items visible in the room
     private String[] itemDescriptions; // Descriptions for those items
     private String[] grabbables; // Items you can take
+    private String[] itemUses; // Uses for items
 
     public Room(String name) { // Constructor
         this.name = name; // Set the room's name
@@ -237,6 +283,13 @@ class Room { // Represents a game room
 
     public String[] getItemDescriptions() { // Getter for descriptions
         return itemDescriptions;
+    }
+
+    public void setItemUses(String[] itemUses) {
+        this.itemUses = itemUses;
+    }
+    public String[] getItemUses() {
+        return itemUses;
     }
 
     public void setGrabbables(String[] grabbables) { // Setter for grabbable items
