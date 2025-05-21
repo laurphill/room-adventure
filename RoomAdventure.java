@@ -53,6 +53,35 @@ public class RoomAdventure { // Main class containing game logic
             }
         }
     }
+    //handles 'use' command
+    private static void handleUse(String noun){
+        boolean hasItem = false;
+
+        //check if the item is in the player's inventory
+        for (String item : inventory){
+            if (noun.equals(item)){
+                hasItem = true;
+                break;
+            }
+        }
+
+        //if player doesn't have item, no action
+        if (!hasItem){
+            status = "\n You don't have a " + noun + "to use.";
+            return;
+        }
+
+        //special case: using cockroach in bathroom results in death 
+        if (currentRoom.toString().contains("Bathroom") && noun.equals("cockroach")){
+            status = "\nYou place the cockroach in the bathtub...\nIt starts twitching violently.\nThe Roach King emerges and deems you unworthy.\nYou DIED!";
+            System.out.println(status);
+            System.exit(0); //ends game
+        }
+
+        //default
+        status = "\nYou try to use the " + noun + ", but nothing happens.";
+
+    }
 
     private static void setupGame() { // Initializes game world
         Room room1 = new Room("Bedroom"); // Create Room 1
@@ -180,6 +209,9 @@ public class RoomAdventure { // Main class containing game logic
                     break;
                 case "take": // If verb is 'take'
                     handleTake(noun); // Pick up an item
+                    break;
+                case "use":
+                    handleUse(noun);
                     break;
                 default: // If verb is unrecognized
                     status = DEFAULT_STATUS; // Set status to error message
