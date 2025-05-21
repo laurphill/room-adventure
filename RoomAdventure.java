@@ -83,6 +83,38 @@ public class RoomAdventure { // Main class containing game logic
 
     }
 
+    // Handles the 'use' command
+private static void handleUse(String noun) {
+    boolean hasKey = false;      // check if player has the key
+    boolean hasHammer = false;   // check if player has the hammer
+
+    // check inventory for key and hammer
+    for (String item : inventory) {
+        if ("key".equals(item)) hasKey = true;
+        if ("hammer".equals(item)) hasHammer = true;
+    }
+
+    // if player is in the Garage
+    if (currentRoom.toString().contains("Garage")) {
+        if (noun.equals("car")) {
+            if (!hasKey) {
+                status = "\nYou need a key to start the car... Where can you find it?";
+            } else if (!hasHammer) {
+                status = "\nThe car starts, but the garage door won't open. If only there was a way to forcefully open it.";
+            } else {
+                status = "\nYou smash the garage door open with the hammer and speed away into freedom. You win!";
+                System.out.println(status);
+                System.exit(0); // dnds game
+            }
+        } else {
+            status = "\nYou can't use that here.";
+        }
+    } else {
+        status = "\nYou can't use that here.";
+    }
+}
+
+
     private static void setupGame() { // Initializes game world
         Room room1 = new Room("Bedroom"); // Create Room 1
         Room room2 = new Room("Bathroom"); // Create Room 2
@@ -210,8 +242,10 @@ public class RoomAdventure { // Main class containing game logic
                 case "take": // If verb is 'take'
                     handleTake(noun); // Pick up an item
                     break;
-                case "use":
-                    handleUse(noun);
+
+                case "use"://ver is 'use'
+                    handleUse(noun); //uses item
+
                     break;
                 default: // If verb is unrecognized
                     status = DEFAULT_STATUS; // Set status to error message
