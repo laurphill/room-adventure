@@ -11,5 +11,7 @@ Jesse's Contributions:
     - Improvement 2: ...
 
 Ashley's Contributions:
-    - Improvement 1: Ability to finish the game
-    - Improvement 2: 
+    - Improvement 1: Ability to finish the game by having key and hammer in inventory and then using the car to escape.
+         - If only key is in inventory, it sends a message that the garage door doesn't open.
+    - Improvement 2: Ability to die in the game by using cockroach in bathroom, which summons Cockroach King and kills the player.
+         - if any other item is used, including cockroach (when not in bathroom), nothing happens.
