@@ -54,65 +54,46 @@ public class RoomAdventure { // Main class containing game logic
         }
     }
     //handles 'use' command
-    private static void handleUse(String noun){
+    private static void handleUse(String noun) {
+        boolean hasKey = false;
+        boolean hasHammer = false;
+        boolean hasCockroach = false;
         boolean hasItem = false;
 
-        //check if the item is in the player's inventory
-        for (String item : inventory){
-            if (noun.equals(item)){
-                hasItem = true;
-                break;
-            }
+        for (String item : inventory) {
+            if (item == null) continue;
+            if ("key".equals(item)) hasKey = true;
+            if ("hammer".equals(item)) hasHammer = true;
+            if ("cockroach".equals(item)) hasCockroach = true;
+            if (noun.equals(item)) hasItem = true;
         }
 
-        //if player doesn't have item, no action
-        if (!hasItem){
-            status = "\n You don't have a " + noun + "to use.";
+        if (!hasItem) {
+            status = "\nYou don't have a " + noun + " to use.";
             return;
         }
 
-        //special case: using cockroach in bathroom results in death 
-        if (currentRoom.toString().contains("Bathroom") && noun.equals("cockroach")){
-            status = "\nYou place the cockroach in the bathtub...\nIt starts twitching violently.\nThe Roach King emerges and deems you unworthy.\nYou DIED!";
+        if (currentRoom.toString().contains("Bathroom") && noun.equals("cockroach")) {
+            status = "\nYou place the cockroach in the bathtub...\nIt begins to twitch violently.\n\nThe Roach King emerges.\nYou are not worthy.\n\nYOU DIED!";
             System.out.println(status);
-            System.exit(0); //ends game
+            System.exit(0); // Game over
         }
 
-        //default
-        status = "\nYou try to use the " + noun + ", but nothing happens.";
-
-    }
-
-    // Handles the 'use' command
-private static void handleUse(String noun) {
-    boolean hasKey = false;      // check if player has the key
-    boolean hasHammer = false;   // check if player has the hammer
-
-    // check inventory for key and hammer
-    for (String item : inventory) {
-        if ("key".equals(item)) hasKey = true;
-        if ("hammer".equals(item)) hasHammer = true;
-    }
-
-    // if player is in the Garage
-    if (currentRoom.toString().contains("Garage")) {
-        if (noun.equals("car")) {
+        if (currentRoom.toString().contains("Garage") && noun.equals("car")) {
             if (!hasKey) {
-                status = "\nYou need a key to start the car... Where can you find it?";
+                status = "\nYou try to start the car, but you don’t have the key.";
             } else if (!hasHammer) {
-                status = "\nThe car starts, but the garage door won't open. If only there was a way to forcefully open it.";
+                status = "\nThe car starts, but the garage door won't open!";
             } else {
-                status = "\nYou smash the garage door open with the hammer and speed away into freedom. You win!";
+                status = "\nYou smash the garage door open with the hammer and speed away into freedom. You win! ";
                 System.out.println(status);
-                System.exit(0); // dnds game
+                System.exit(0); // Victory
             }
-        } else {
-            status = "\nYou can't use that here.";
+            return;
         }
-    } else {
-        status = "\nYou can't use that here.";
+        status = "\nYou try to use the " + noun + ", but nothing happens.";
     }
-}
+
 
 
     private static void setupGame() { // Initializes game world
