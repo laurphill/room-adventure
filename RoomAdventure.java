@@ -295,7 +295,7 @@ public class RoomAdventure { // Main class containing game logic
         };
         String[] room4Grabbables = {"beer", "beer", "beer", "beer", "beer", "beer"};
         String[] room4ItemUses = {
-            "You open the fridge and grab a beer.",
+            "You open the fridge and see beer and moldy food.",
             "You try to use the sink. The water is cold.",
         };
         room4.setExitDirections(room4ExitDirections); // Set exits
