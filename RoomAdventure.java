@@ -10,6 +10,11 @@ public class RoomAdventure { // Main class containing game logic
     private static String[] inventory = {null, null, null, null, null}; // Player inventory slots
     private static String status; // Message to display after each action
     private static boolean hasItem; // If an item is in inventory
+    private static boolean hasKey = false;
+    private static boolean hasHammer = false;
+    private static boolean hasCockroach = false;
+    private static boolean hasBucket = false;
+    private static boolean hasBeer = false;
 
     private static void handleGo(String noun) { // Handles moving between rooms
         String[] exitDirections = currentRoom.getExitDirections(); // Get available directions
@@ -48,7 +53,23 @@ public class RoomAdventure { // Main class containing game logic
                     if (inventory[j] == null) { // If slot is empty
                         inventory[j] = noun; // Add item to inventory
                         status = String.format("\nAdded %s to inventory", noun); // Update status
-                        break; // Exit inventory loop
+
+                        String[] items = currentRoom.getItems();
+                        int removeIndex = -1;
+                        for (int k = 0; k < items.length; k++) {
+                            if (items[k].equals(noun)) {
+                                removeIndex = k;
+                                break;
+                            }
+                        }
+
+                        currentRoom.setGrabbables(removeFromArray(grabbables, noun)); // Remove from grabbables
+                        currentRoom.setItems(removeFromArray(currentRoom.getItems(), noun)); // Remove from items
+                        if (removeIndex != -1) {
+                        currentRoom.setItemDescriptions(removeFromArrayByIndex(currentRoom.getItemDescriptions(), removeIndex));
+                        currentRoom.setItemUses(removeFromArrayByIndex(currentRoom.getItemUses(), removeIndex));
+                        }
+                    break; // Exit inventory loop
                     }
                 }
             }
@@ -90,7 +111,30 @@ public class RoomAdventure { // Main class containing game logic
         }
     }
 
+    // Remove an item from array by value
+    private static String[] removeFromArray(String[] array, String value) {
+        java.util.List<String> list = new java.util.ArrayList<>();
+        for (String item : array) {
+            if (!item.equals(value)) {
+                list.add(item);
+            }
+        }
+        return list.toArray(new String[0]);
+    }
+
+    // Remove an item from array by index
+    private static String[] removeFromArrayByIndex(String[] array, int index) {
+        java.util.List<String> list = new java.util.ArrayList<>();
+        for (int i = 0; i < array.length; i++) {
+            if (i != index) {
+                list.add(array[i]);
+            }
+        }
+        return list.toArray(new String[0]);
+    }
+
     private static void setupGame() { // Initializes game world
+        
         Room room1 = new Room("Bedroom"); // Create Room 1
         Room room2 = new Room("Bathroom"); // Create Room 2
         Room room3 = new Room("Living Room"); // Create Room 3
@@ -103,7 +147,7 @@ public class RoomAdventure { // Main class containing game logic
         String[] room1Items = {"chair", "desk"}; // Items in Room 1
         String[] room1ItemDescriptions = { // Descriptions for Room 1 items
             "\nIt is a chair",
-            "\nIt's a desk, there is a key on it."
+            "\nIt's a desk, there is a drawer."
         };
         String[] room1ItemUses = {
             "You sit on the chair. It's surprisingly comfortable.",
@@ -126,11 +170,16 @@ public class RoomAdventure { // Main class containing game logic
             "\nJust a gross, clogged toilet."
         };
         String[] room2Grabbables = {"cockroach"}; // Items you can take in Room 2
+        String[] room2ItemUses = {
+            "You try to use the bathtub. It's full of cockroaches!",
+            "You try to flush the toilet. It makes a horrible noise."
+        };
         room2.setExitDirections(room2ExitDirections); // Set exits
         room2.setExitDestinations(room2ExitDestinations); // Set exit destinations
         room2.setItems(room2Items); // Set visible items
         room2.setItemDescriptions(room2ItemDescriptions); // Set item descriptions
         room2.setGrabbables(room2Grabbables); // Set grabbable items
+        room2.setItemUses(room2ItemUses);
 
         //ROOM 3 (LIVING ROOM)
         String[] room3ExitDirections = {"north", "west", "south"}; // Room 3 exits
@@ -141,12 +190,16 @@ public class RoomAdventure { // Main class containing game logic
             "\nIt's a tv, but there is no signal."
         };
         String[] room3Grabbables = {"bucket"}; // Items you can take in Room 3
+        String[] room3ItemUses = {
+            "You sit on the couch. It's comfy, but you find nothing.",
+            "You turn on the TV. Still no signal."
+        };
         room3.setExitDirections(room3ExitDirections); // Set exits
         room3.setExitDestinations(room3ExitDestinations); // Set exit destinations
         room3.setItems(room3Items); // Set visible items
         room3.setItemDescriptions(room3ItemDescriptions); // Set item descriptions
+        room3.setItemUses(room3ItemUses);
         room3.setGrabbables(room3Grabbables); // Set grabbable items
-    
 
         //ROOM 4 (KITCHEN)
         String[] room4ExitDirections = {"north", "east"}; // Room 4 exits
@@ -157,10 +210,15 @@ public class RoomAdventure { // Main class containing game logic
             "\nIt is a full sink"
         };
         String[] room4Grabbables = {"beer"}; // Items you can take in Room 4
+        String[] room4ItemUses = {
+            "You open the fridge and grab a beer.",
+            "You try to use the sink. The water is cold."
+        };
         room4.setExitDirections(room4ExitDirections); // Set exits
         room4.setExitDestinations(room4ExitDestinations); // Set exit destinations
         room4.setItems(room4Items); // Set visible items
         room4.setItemDescriptions(room4ItemDescriptions); // Set item descriptions
+        room4.setItemUses(room4ItemUses);
         room4.setGrabbables(room4Grabbables); // Set grabbable items
 
 
@@ -192,6 +250,20 @@ public class RoomAdventure { // Main class containing game logic
             System.out.print(currentRoom.toString()); // Display current room description
             System.out.print("Inventory: "); // Prompt for inventory display
 
+            for (String item : inventory) {
+            if (item == null) continue;
+            if ("key".equals(item)) hasKey = true;
+            else{hasKey = false;}
+            if ("hammer".equals(item)) hasHammer = true;
+            else{hasHammer = false;}
+            if ("cockroach".equals(item)) hasCockroach = true;
+            else{hasCockroach = false;}
+            if ("bucket".equals(item)) hasBucket = true;
+            else{hasBucket = false;}
+            if ("beer".equals(item)) hasBeer = true;
+            else{hasBeer = false;}
+        }
+        
             for (int i = 0; i < inventory.length; i++) { // Loop through inventory slots
                 System.out.print(inventory[i] + " "); // Print each inventory item
             }
