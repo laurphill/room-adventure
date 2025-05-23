@@ -75,24 +75,25 @@ public class RoomAdventure { // Main class containing game logic
             }
         }
     }
+    //handles 'use' command
+    private static void handleUse(String noun) {
+        boolean hasKey = false;
+        boolean hasHammer = false;
+        boolean hasCockroach = false;
+        boolean hasItem = false;
 
-    private static void handleUse(String noun) { // Handles picking up items
         status = "\nYou can't use that."; // Default if not useable
         String[] grabbables = currentRoom.getGrabbables(); // Items that can be taken
         // Check if the item is in the current room's items and get its use
-            String[] items = currentRoom.getItems();
-            String[] uses = currentRoom.getItemUses();
-            for (int i = 0; i < items.length; i++) {
-                if (noun.equals(items[i])) {
-                    if (uses != null && uses[i] != null) {
-                        status = "\n" + uses[i];
-                    } else {
-                        status = "\nNothing happens.";
-                    }
-                    return;
+        String[] items = currentRoom.getItems();
+        String[] uses = currentRoom.getItemUses();
+        for (int i = 0; i < items.length; i++) {
+            if (noun.equals(items[i])) {
+                if (uses != null && uses[i] != null) {
+                    status = "\n" + uses[i];
                 }
             }
-            status = "\nYou can't use that here.";
+        }
         for (String item : inventory) { // Loop through inventory
             if (noun.equals(item)) { // If user-noun matches inventory item
                 hasItem = true;
@@ -109,6 +110,34 @@ public class RoomAdventure { // Main class containing game logic
                 }
             }
         }
+
+        for (String item : inventory) {
+            if (item == null) continue;
+            if ("key".equals(item)) hasKey = true;
+            if ("hammer".equals(item)) hasHammer = true;
+            if ("cockroach".equals(item)) hasCockroach = true;
+            if (noun.equals(item)) hasItem = true;
+        }
+
+        if (currentRoom.toString().contains("Bathroom") && noun.equals("cockroach")) {
+            status = "\nYou place the cockroach in the bathtub...\nIt begins to twitch violently.\n\nThe Roach King emerges.\nYou are not worthy.\n\nYOU DIED!";
+            System.out.println(status);
+            System.exit(0); // Game over
+        }
+
+        if (currentRoom.toString().contains("Garage") && noun.equals("car")) {
+            if (!hasKey) {
+                status = "\nYou try to start the car, but you don't have the key.";
+            } else if (!hasHammer) {
+                status = "\nThe car starts, but the garage door won't open!";
+            } else {
+                status = "\nYou smash the garage door open with the hammer and speed away into freedom. You win! ";
+                System.out.println(status);
+                System.exit(0); // Victory
+            }
+            return;
+        }
+        status = "\nYou try to use the " + noun + ", but nothing happens.";
     }
 
     // Remove an item from array by value
@@ -231,12 +260,17 @@ public class RoomAdventure { // Main class containing game logic
             "\nIt's a hammer, where can I use this?"
         };
         String[] room5Grabbables = {"hammer"}; // Items you can take in Room 5
+        String[] room5ItemUses = {
+            "",
+        };
+
         room5.setExitDirections(room5ExitDirections); // Set exits
         room5.setExitDestinations(room5ExitDestinations); // Set exit destinations
         room5.setItems(room5Items); // Set visible items
         room5.setItemDescriptions(room5ItemDescriptions); // Set item descriptions
         room5.setGrabbables(room5Grabbables); // Set grabbable items
-    
+        room5.setItemUses(room5ItemUses);
+
         currentRoom = room1; // Start game in Room 1
 
     }
